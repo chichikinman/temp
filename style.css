@@ -1,0 +1,213 @@
+:root {
+    --bg-color: #080c0a;
+    --main-green: #33ff66;
+    --dim-green: #156d2e;
+    --dark-green: #071f0f;
+    --alert-red: #ff3344;
+    --border-color: #144d24;
+    --accent-gold: #ffcc00;
+    --accent-blue: #00ddff;
+    --accent-purple: #cc66ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-color);
+    color: var(--main-green);
+    font-family: "Courier New", Courier, monospace, sans-serif;
+    margin: 0;
+    padding: 8px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.terminal {
+    border: 2px solid var(--dim-green);
+    border-radius: 4px;
+    padding: 8px;
+    min-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(rgba(18, 30, 20, 0.15) 50%, rgba(0, 0, 0, 0.45) 50%);
+    background-size: 100% 4px;
+}
+
+header {
+    border-bottom: 1px dashed var(--dim-green);
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+    line-height: 1.25;
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.tab-btn {
+    background: transparent;
+    color: var(--dim-green);
+    border: 1px solid var(--dim-green);
+    padding: 5px 7px;
+    font-size: 0.72rem;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.tab-btn.active {
+    background-color: var(--main-green);
+    color: #000;
+    font-weight: bold;
+}
+
+.tab-content { display: none; flex-grow: 1; }
+.tab-content.active { display: flex; flex-direction: column; }
+
+.panel-box {
+    background-color: var(--dark-green);
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    margin-bottom: 6px;
+}
+
+.asset-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 2px 0;
+}
+.asset-val { font-size: 1.15rem; font-weight: bold; }
+.rate-badge { font-size: 0.7rem; color: #88cc99; }
+
+.sub-nav { display: flex; gap: 4px; margin-bottom: 6px; }
+.sub-btn {
+    flex: 1;
+    padding: 5px;
+    background: transparent;
+    border: 1px solid var(--dim-green);
+    color: var(--dim-green);
+    font-family: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+.sub-btn.active {
+    background-color: var(--dim-green);
+    color: #fff;
+    font-weight: bold;
+}
+
+.card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+    max-height: 60vh;
+}
+
+.card {
+    border: 1px solid var(--border-color);
+    background: rgba(4, 15, 8, 0.9);
+    padding: 7px;
+    font-size: 0.75rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.btn {
+    background: var(--dark-green);
+    color: var(--main-green);
+    border: 1px solid var(--main-green);
+    padding: 6px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 4px;
+}
+.btn:active { background: var(--main-green); color: #000; }
+.btn-danger { border-color: var(--alert-red); color: var(--alert-red); }
+.btn-gold { border-color: var(--accent-gold); color: var(--accent-gold); }
+.btn-purple { border-color: var(--accent-purple); color: var(--accent-purple); }
+
+input, select, textarea {
+    width: 100%;
+    background: #000;
+    border: 1px solid var(--dim-green);
+    color: var(--main-green);
+    padding: 5px;
+    margin-bottom: 5px;
+    font-family: inherit;
+    font-size: 0.75rem;
+}
+
+label { font-size: 0.68rem; color: #88cc99; display: block; margin-bottom: 1px; }
+
+.log-panel {
+    border: 1px solid var(--dim-green);
+    padding: 4px;
+    background: #040905;
+    font-size: 0.7rem;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+}
+.log-content { overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column-reverse; }
+.log-entry { margin-bottom: 2px; opacity: 0.85; }
+
+/* 闘技場ゲージ */
+.hp-bar-bg, .atb-bar-bg {
+    background: #000;
+    border: 1px solid var(--dim-green);
+    height: 10px;
+    width: 100%;
+    margin: 2px 0;
+    position: relative;
+}
+.hp-bar-fill { background: var(--main-green); height: 100%; width: 100%; transition: width 0.1s; }
+.atb-bar-fill { background: var(--accent-blue); height: 100%; width: 0%; transition: width 0.05s; }
+
+/* 目押しミニゲーム */
+.timing-container {
+    border: 2px solid var(--accent-purple);
+    padding: 8px;
+    background: #000;
+    text-align: center;
+    margin-top: 8px;
+}
+.timing-bar {
+    width: 100%;
+    height: 22px;
+    background: #111;
+    border: 1px solid #444;
+    position: relative;
+    margin: 8px 0;
+    overflow: hidden;
+}
+.timing-target {
+    position: absolute;
+    height: 100%;
+    background: rgba(51, 255, 102, 0.4);
+    border-left: 1px dashed var(--main-green);
+    border-right: 1px dashed var(--main-green);
+}
+.timing-pointer {
+    position: absolute;
+    height: 100%;
+    width: 4px;
+    background: var(--accent-gold);
+    top: 0;
+    left: 0;
+}

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>治安局・携帯情報端末 OS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="terminal">
+    <header>
+        <div>[治安維持局・第8管区 居住査察局 携帯端末 OS]</div>
+        <div>査察員: #08-4419 / スラム収奪・地下闘技場統制プロトコル</div>
+    </header>
+
+    <!-- ナビゲーションタブ -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('main')">端末主画面</button>
+        <button class="tab-btn" onclick="switchTab('biz')">事業・利権</button>
+        <button class="tab-btn" onclick="switchTab('arena')">地下闘技場</button>
+        <button class="tab-btn" onclick="switchTab('shop')">違法闇市</button>
+        <button class="tab-btn" onclick="switchTab('inventory')">所持品</button>
+        <button class="tab-btn" onclick="switchTab('dev')">開発者MENU</button>
+    </div>
+
+    <!-- 1. メイン画面 -->
+    <div id="tab-main" class="tab-content active">
+        <div class="panel-box">
+            <div style="font-size: 0.7rem; color: var(--dim-green);">▼ 査察員 隠匿私有資産</div>
+            <div class="asset-row">
+                <span>裏金 (クレジット):</span>
+                <span class="asset-val" id="money-display">0.0</span>
+            </div>
+            <div class="rate-badge" id="cps-display">+0.10 CR/秒</div>
+
+            <div class="asset-row" style="margin-top: 6px;">
+                <span>横領物資 (ロット):</span>
+                <span class="asset-val" id="supply-display">0.0</span>
+            </div>
+            <div class="rate-badge" id="mps-display">+0.05 MPS/秒</div>
+        </div>
+
+        <div class="panel-box">
+            <div style="font-size: 0.7rem; color: var(--dim-green); margin-bottom: 4px;">▼ 査察員 特殊能力</div>
+            <div class="asset-row">
+                <span>不正工作スキル (チート精度):</span>
+                <span style="font-weight:bold; color:var(--accent-purple);" id="cheat-skill-display">10</span>
+            </div>
+            <div style="font-size:0.68rem; color:#88cc99;">※闇市の自己強化アイテムで増減可能。目押し成功幅を拡大します。</div>
+        </div>
+
+        <div class="panel-box">
+            <div style="font-size: 0.7rem; color: var(--dim-green); margin-bottom: 4px;">▼ 精神・身体充足度 (1分毎に-1)</div>
+            <div id="needs-container"></div>
+        </div>
+
+        <div class="log-panel">
+            <div style="color: var(--dim-green); font-size: 0.65rem; border-bottom: 1px solid var(--border-color);">SYSTEM LOGS:</div>
+            <div class="log-content" id="log-content"></div>
+        </div>
+    </div>
+
+    <!-- 2. 事業・利権（放置経済） -->
+    <div id="tab-biz" class="tab-content">
+        <div class="sub-nav">
+            <button class="sub-btn active" id="btn-biz-slum" onclick="switchBizSubTab('slum')">スラム事業 (物資投資)</button>
+            <button class="sub-btn" id="btn-biz-gov" onclick="switchBizSubTab('gov')">治安局利権 (裏金上納)</button>
+        </div>
+        <div id="biz-sub-desc" style="font-size:0.7rem; color:#88cc99; margin-bottom:4px;"></div>
+        <div class="card-list" id="biz-list"></div>
+    </div>
+
+    <!-- 3. 地下闘技場 -->
+    <div id="tab-arena" class="tab-content">
+        <!-- トップ -->
+        <div id="arena-view-top">
+            <div class="panel-box">
+                <div style="font-size:0.7rem; color:var(--accent-gold);">【次回公式マッチアップ】</div>
+                <div id="arena-match-preview" style="margin: 6px 0;"></div>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn btn-gold" onclick="openBettingView()">賭け・会場細工へ</button>
+                    <button class="btn" onclick="openFightersList()">ファイター控室へ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控室一覧 -->
+        <div id="arena-view-fighters" style="display:none;">
+            <button class="btn" onclick="backToArenaTop()" style="margin-bottom:6px;">◀ 闘技場トップへ戻る</button>
+            <div style="font-size:0.72rem; color:var(--dim-green); margin-bottom:4px;">▼ 所属専属ファイター一覧 (タップでカルテ)</div>
+            <div class="card-list" id="arena-fighters-list"></div>
+        </div>
+
+        <!-- 個別カルテ -->
+        <div id="arena-view-fighter-detail" style="display:none;">
+            <button class="btn" onclick="openFightersList()" style="margin-bottom:6px;">◀ 控室一覧へ戻る</button>
+            <div id="fighter-detail-content"></div>
+        </div>
+
+        <!-- 賭け・罠セット -->
+        <div id="arena-view-bet" style="display:none;">
+            <button class="btn" onclick="backToArenaTop()" style="margin-bottom:6px;">◀ 闘技場トップへ戻る</button>
+            <div class="panel-box">
+                <div style="font-size:0.75rem; font-weight:bold; color:var(--accent-gold);">【VIP査察員 賭け金・細工確定】</div>
+                <div id="bet-fighters-info" style="margin: 6px 0;"></div>
+                
+                <label>賭け対象を選択</label>
+                <select id="bet-target-select"></select>
+
+                <label>賭け金 (裏金CR)</label>
+                <input type="number" id="bet-amount-input" placeholder="例: 100">
+
+                <label>会場細工 (環境トラップを1つセット)</label>
+                <select id="trap-select"><option value="">-- セットなし --</option></select>
+                <div style="font-size:0.68rem; color:var(--alert-red); margin-top:2px;">
+                    ※罠を使用した場合、勝利時に純利益の10%が会場管理員への賄賂（揉み消し料）として自動控除されます。
+                </div>
+
+                <button class="btn btn-gold" onclick="startArenaBattle()" style="margin-top:10px;">試合開始 (BET確定)</button>
+            </div>
+        </div>
+
+        <!-- 観戦バトル画面 -->
+        <div id="arena-view-battle" style="display:none;">
+            <div class="panel-box">
+                <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:bold; display:flex; justify-content:space-between;">
+                    <span>DEATHMATCH LIVE</span>
+                    <span id="battle-timer">00:00</span>
+                </div>
+
+                <div id="combatant-a-box" style="margin-top:6px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.72rem;">
+                        <span id="comb-a-name">Fighter A</span>
+                        <span id="comb-a-hp-num">200/200</span>
+                    </div>
+                    <div class="hp-bar-bg"><div class="hp-bar-fill" id="comb-a-hp-bar"></div></div>
+                    <div class="atb-bar-bg"><div class="atb-bar-fill" id="comb-a-atb-bar"></div></div>
+                </div>
+
+                <div id="combatant-b-box" style="margin-top:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.72rem;">
+                        <span id="comb-b-name">Fighter B</span>
+                        <span id="comb-b-hp-num">200/200</span>
+                    </div>
+                    <div class="hp-bar-bg"><div class="hp-bar-fill" id="comb-b-hp-bar"></div></div>
+                    <div class="atb-bar-bg"><div class="atb-bar-fill" id="comb-b-atb-bar"></div></div>
+                </div>
+
+                <div style="display:flex; gap:6px; margin-top:10px;">
+                    <button class="btn btn-gold" id="btn-trigger-trap" onclick="triggerInstalledTrap()" disabled>罠発動</button>
+                    <button class="btn btn-purple" id="btn-trigger-cheat" onclick="openCheatModal()">チート介入 (時間停止)</button>
+                </div>
+            </div>
+
+            <!-- 目押しモーダル -->
+            <div id="cheat-modal" class="timing-container" style="display:none;">
+                <div style="color:var(--accent-purple); font-size:0.75rem; font-weight:bold;">【裏工作・目押し介入】</div>
+                <div style="font-size:0.68rem; color:#aaa;">緑の成功ゾーンで停止させろ！</div>
+                <div class="timing-bar" id="timing-bar">
+                    <div class="timing-target" id="timing-target"></div>
+                    <div class="timing-pointer" id="timing-pointer"></div>
+                </div>
+                <label>妨害対象ファイター</label>
+                <select id="cheat-target-fighter"></select>
+                <label>チート妨害内容</label>
+                <select id="cheat-action-select"></select>
+                <button class="btn btn-purple" onclick="stopCheatPointer()">タイミング決定 (SHOT)</button>
+            </div>
+
+            <div class="log-panel" style="height:110px;">
+                <div style="color:var(--dim-green); font-size:0.65rem;">PIT BATTLE LOGS:</div>
+                <div class="log-content" id="battle-log-content"></div>
+            </div>
+
+            <div id="battle-result-box" style="display:none; margin-top:8px;" class="panel-box">
+                <div id="battle-result-text" style="font-size:0.85rem; font-weight:bold; margin-bottom:6px;"></div>
+                <button class="btn" onclick="finishBattleAndReturn()">精算して闘技場トップへ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 違法闇市 -->
+    <div id="tab-shop" class="tab-content">
+        <div class="sub-nav">
+            <button class="sub-btn active" id="btn-shop-buy" onclick="switchShopSubTab('buy')">闇市調達 (購入)</button>
+            <button class="sub-btn" id="btn-shop-sell" onclick="switchShopSubTab('sell')">流出品売却 (換金)</button>
+        </div>
+        <div class="card-list" id="shop-list"></div>
+    </div>
+
+    <!-- 5. 所持品 -->
+    <div id="tab-inventory" class="tab-content">
+        <div style="font-size: 0.72rem; color: var(--dim-green); margin-bottom: 4px;">▼ 査察員 私物ロッカー</div>
+        <div class="card-list" id="inventory-list"></div>
+    </div>
+
+    <!-- 6. 開発者MENU -->
+    <div id="tab-dev" class="tab-content">
+        <div class="sub-nav">
+            <button class="sub-btn active" onclick="switchDevSubTab('econ')">放置経済</button>
+            <button class="sub-btn" onclick="switchDevSubTab('tier')">Tier管理</button>
+            <button class="sub-btn" onclick="switchDevSubTab('arena')">闘技場</button>
+            <button class="sub-btn" onclick="switchDevSubTab('items')">アイテム</button>
+            <button class="sub-btn" onclick="switchDevSubTab('backup')">データ</button>
+        </div>
+
+        <div class="panel-box" style="overflow-y:auto; max-height:65vh;">
+            <div id="dev-sub-econ">
+                <div style="font-size:0.75rem; font-weight:bold;">【基礎生成 & 数式パラメータ】</div>
+                <label>初期CPS</label><input type="number" step="0.01" id="cfg-base-cps">
+                <label>初期MPS</label><input type="number" step="0.01" id="cfg-base-mps">
+                <div style="color:var(--accent-gold); font-size:0.7rem; margin-top:4px;">スラムパラメータ</div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>C0</label><input type="number" id="cfg-slum-c0"></div>
+                    <div><label>K_cost</label><input type="number" step="0.1" id="cfg-slum-kcost"></div>
+                    <div><label>P0</label><input type="number" step="0.01" id="cfg-slum-p0"></div>
+                    <div><label>K_prod</label><input type="number" step="0.1" id="cfg-slum-kprod"></div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>baseR</label><input type="number" step="0.01" id="cfg-slum-baser"></div>
+                    <div><label>疲弊Lv</label><input type="number" id="cfg-slum-thresh"></div>
+                    <div><label>疲弊指数</label><input type="number" step="0.01" id="cfg-slum-exp"></div>
+                </div>
+                <div style="color:var(--accent-blue); font-size:0.7rem; margin-top:4px;">政府パラメータ</div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>C0</label><input type="number" id="cfg-gov-c0"></div>
+                    <div><label>K_cost</label><input type="number" step="0.1" id="cfg-gov-kcost"></div>
+                    <div><label>P0</label><input type="number" step="0.01" id="cfg-gov-p0"></div>
+                    <div><label>K_prod</label><input type="number" step="0.1" id="cfg-gov-kprod"></div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>baseR</label><input type="number" step="0.01" id="cfg-gov-baser"></div>
+                    <div><label>インフレ率</label><input type="number" step="0.0001" id="cfg-gov-infl"></div>
+                </div>
+                <label>同Tierシナジー率/Lv</label><input type="number" step="0.01" id="cfg-synergy">
+                <button class="btn" onclick="saveEconConfig()">経済パラメータを保存</button>
+            </div>
+
+            <div id="dev-sub-tier" style="display:none;">
+                <div style="font-size:0.75rem; font-weight:bold;">【Tier動的追加・管理】</div>
+                <div style="color:var(--accent-gold); font-size:0.7rem; margin-top:4px;">スラム事業 Tier一覧</div>
+                <div id="dev-slum-tier-list"></div>
+                <button class="btn" onclick="addNewTier('slum')">+ スラム新Tierを追加</button>
+
+                <div style="color:var(--accent-blue); font-size:0.7rem; margin-top:10px;">政府利権 Tier一覧</div>
+                <div id="dev-gov-tier-list"></div>
+                <button class="btn" onclick="addNewTier('gov')">+ 政府新Tierを追加</button>
+            </div>
+
+            <div id="dev-sub-arena" style="display:none;">
+                <div style="font-size:0.75rem; font-weight:bold;">【地下闘技場 数式パラメータ】</div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>オッズ指数β</label><input type="number" step="0.05" id="cfg-arena-beta"></div>
+                    <div><label>胴元控除率H</label><input type="number" step="0.01" id="cfg-arena-h"></div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>最小オッズ</label><input type="number" step="0.05" id="cfg-arena-minodds"></div>
+                    <div><label>最大オッズ</label><input type="number" step="1" id="cfg-arena-maxodds"></div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <div><label>罠賄賂率 (0.1=10%)</label><input type="number" step="0.01" id="cfg-arena-bribe"></div>
+                    <div><label>非出場者回復量</label><input type="number" id="cfg-arena-rest"></div>
+                </div>
+                <button class="btn" onclick="saveArenaConfig()">闘技場パラメータを保存</button>
+            </div>
+
+            <div id="dev-sub-items" style="display:none;">
+                <div style="font-size:0.75rem; font-weight:bold;">【闇市アイテム登録】</div>
+                <label>名前</label><input type="text" id="dev-item-name" placeholder="例: 粗悪な精神安定剤">
+                <div style="display:flex; gap:4px;">
+                    <div><label>買値(CR)</label><input type="number" id="dev-item-buy"></div>
+                    <div><label>売値(CR)</label><input type="number" id="dev-item-sell"></div>
+                </div>
+                <label>カテゴリ</label>
+                <select id="dev-item-category">
+                    <option value="need">欲求充足 (自室で使用)</option>
+                    <option value="player_stat">査察員強化 (チートスキル等)</option>
+                    <option value="drug_stat">薬物: 基礎ステータス (控室で使用)</option>
+                    <option value="drug_part">薬物: 部位耐久力 (控室で使用)</option>
+                    <option value="equip">装備品 (控室で供与・実効値)</option>
+                    <option value="trap">会場細工 (ベット時にセット)</option>
+                </select>
+                <label>対象パラメータ</label>
+                <input type="text" id="dev-item-target" placeholder="例: hp / arms / cheatSkill">
+                <label>効果量 (数値)</label>
+                <input type="number" id="dev-item-amount" placeholder="例: 15 / -15">
+                <button class="btn" onclick="devRegisterItem()">アイテム登録</button>
+                <div id="dev-item-list" style="margin-top:6px;"></div>
+            </div>
+
+            <div id="dev-sub-backup" style="display:none;">
+                <div style="font-size:0.75rem; font-weight:bold;">【全セーブデータJSONバックアップ】</div>
+                <textarea id="dev-json-area" rows="4"></textarea>
+                <div style="display:flex; gap:4px;">
+                    <button class="btn" onclick="exportData()">書き出し</button>
+                    <button class="btn" onclick="importData()">取り込み</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 分割したJavaScriptモジュールの順次読み込み -->
+<script src="js/core.js"></script>
+<script src="js/idle.js"></script>
+<script src="js/arena.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/dev.js"></script>
+
+</body>
+</html>
